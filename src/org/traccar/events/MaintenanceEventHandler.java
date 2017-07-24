@@ -29,6 +29,7 @@ public class MaintenanceEventHandler extends BaseEventHandler {
 
     public static final String ATTRIBUTE_MAINTENANCE_START = "maintenance.start";
     public static final String ATTRIBUTE_MAINTENANCE_INTERVAL = "maintenance.interval";
+    public static final String ATTRIBUTE_MAINTENANCE_ATTRIBUTE = "maintenance.attribute";
 
     @Override
     protected Collection<Event> analyzePosition(Position position) {
@@ -45,21 +46,25 @@ public class MaintenanceEventHandler extends BaseEventHandler {
         double maintenanceStart = Context.getDeviceManager()
                 .lookupAttributeDouble(device.getId(), ATTRIBUTE_MAINTENANCE_START, 0, false);
 
-        double oldTotalDistance = 0.0;
-        double newTotalDistance = 0.0;
+        String maintenanceAttribute = Context.getDeviceManager()
+                .lookupAttributeString(device.getId(), ATTRIBUTE_MAINTENANCE_ATTRIBUTE,
+                        Position.KEY_TOTAL_DISTANCE, false);
+
+        double oldTotalAttribute = 0.0;
+        double newTotalAttribute = 0.0;
 
         Position lastPosition = Context.getIdentityManager().getLastPosition(position.getDeviceId());
         if (lastPosition != null) {
-            oldTotalDistance = lastPosition.getDouble(Position.KEY_TOTAL_DISTANCE);
+            oldTotalAttribute = lastPosition.getDouble(maintenanceAttribute);
         }
-        newTotalDistance = position.getDouble(Position.KEY_TOTAL_DISTANCE);
+        newTotalAttribute = position.getDouble(maintenanceAttribute);
 
-        oldTotalDistance -= maintenanceStart;
-        newTotalDistance -= maintenanceStart;
+        oldTotalAttribute -= maintenanceStart;
+        newTotalAttribute -= maintenanceStart;
 
-        if ((long) (oldTotalDistance / maintenanceInterval) < (long) (newTotalDistance / maintenanceInterval)) {
+        if ((long) (oldTotalAttribute / maintenanceInterval) < (long) (newTotalAttribute / maintenanceInterval)) {
             Event event = new Event(Event.TYPE_MAINTENANCE, position.getDeviceId(), position.getId());
-            event.set(Position.KEY_TOTAL_DISTANCE, newTotalDistance);
+            event.set(maintenanceAttribute, newTotalAttribute);
             return Collections.singleton(event);
         }
 
