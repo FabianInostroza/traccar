@@ -15,7 +15,7 @@
  */
 package org.traccar.events;
 
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.netty.channel.ChannelHandler;
@@ -35,20 +35,29 @@ public class AlertEventHandler extends BaseEventHandler {
 
     @Override
     protected Map<Event, Position> analyzePosition(Position position) {
-        Object alarm = position.getAttributes().get(Position.KEY_ALARM);
-        if (alarm != null) {
-            boolean ignoreAlert = false;
-            if (ignoreDuplicateAlerts) {
-                Position lastPosition = Context.getIdentityManager().getLastPosition(position.getDeviceId());
-                if (lastPosition != null && alarm.equals(lastPosition.getAttributes().get(Position.KEY_ALARM))) {
-                    ignoreAlert = true;
+        Object alarms = position.getAttributes().get(Position.KEY_ALARM);
+        if (alarms != null) {
+            Map<Event, Position> eventMap = new LinkedHashMap<>();
+            String[] alarmList = alarms.toString().split(",");
+            for (String alarm : alarmList) {
+                boolean ignoreAlert = false;
+                if (ignoreDuplicateAlerts) {
+                    Position lastPosition = Context.getIdentityManager().getLastPosition(position.getDeviceId());
+                    if (lastPosition != null) {
+                        Object alarmAttrs = lastPosition.getAttributes().get(Position.KEY_ALARM);
+                        if (alarmAttrs != null && alarmAttrs.toString().contains(alarm)) {
+                            ignoreAlert = true;
+                        }
+                    }
+                }
+
+                if (!ignoreAlert) {
+                    Event event = new Event(Event.TYPE_ALARM, position.getDeviceId(), position.getId());
+                    event.set(Position.KEY_ALARM, (String) alarm);
+                    eventMap.put(event, position);
                 }
             }
-            if (!ignoreAlert) {
-                Event event = new Event(Event.TYPE_ALARM, position.getDeviceId(), position.getId());
-                event.set(Position.KEY_ALARM, (String) alarm);
-                return Collections.singletonMap(event, position);
-            }
+            return eventMap;
         }
         return null;
     }
