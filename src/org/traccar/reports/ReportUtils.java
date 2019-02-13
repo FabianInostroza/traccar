@@ -66,7 +66,7 @@ public final class ReportUtils {
     }
 
     public static String getSpeedUnit(long userId) {
-        return (String) Context.getPermissionsManager().lookupAttribute(userId, "speedUnit", "kn");
+        return (String) Context.getPermissionsManager().lookupAttribute(userId, "speedUnit", "kmh");
     }
 
     public static String getVolumeUnit(long userId) {

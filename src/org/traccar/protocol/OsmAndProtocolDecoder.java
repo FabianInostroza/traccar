@@ -118,7 +118,7 @@ public class OsmAndProtocolDecoder extends BaseHttpProtocolDecoder {
                                 wifi[0].replace('-', ':'), Integer.parseInt(wifi[1])));
                         break;
                     case "speed":
-                        position.setSpeed(convertSpeed(Double.parseDouble(value), "kn"));
+                        position.setSpeed(Double.parseDouble(value));
                         break;
                     case "bearing":
                     case "heading":

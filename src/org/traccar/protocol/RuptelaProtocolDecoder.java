@@ -23,7 +23,6 @@ import org.traccar.DeviceSession;
 import org.traccar.NetworkMessage;
 import org.traccar.Protocol;
 import org.traccar.helper.DataConverter;
-import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
 
 import java.net.SocketAddress;
@@ -156,7 +155,7 @@ public class RuptelaProtocolDecoder extends BaseProtocolDecoder {
 
                 position.set(Position.KEY_SATELLITES, buf.readUnsignedByte());
 
-                position.setSpeed(UnitsConverter.knotsFromKph(buf.readUnsignedShort()));
+                position.setSpeed(buf.readUnsignedShort());
 
                 position.set(Position.KEY_HDOP, buf.readUnsignedByte() / 10.0);
 
