@@ -25,7 +25,6 @@ import org.traccar.DeviceSession;
 import org.traccar.NetworkMessage;
 import org.traccar.Protocol;
 import org.traccar.helper.BitUtil;
-import org.traccar.helper.UnitsConverter;
 import org.traccar.model.CellTower;
 import org.traccar.model.Network;
 import org.traccar.model.Position;
@@ -317,7 +316,7 @@ public class TeltonikaProtocolDecoder extends BaseProtocolDecoder {
                 }
 
                 if (BitUtil.check(locationMask, 3)) {
-                    position.setSpeed(UnitsConverter.knotsFromKph(buf.readUnsignedByte()));
+                    position.setSpeed(buf.readUnsignedByte());
                 }
 
                 if (BitUtil.check(locationMask, 4)) {
@@ -368,7 +367,7 @@ public class TeltonikaProtocolDecoder extends BaseProtocolDecoder {
 
             position.setValid(satellites != 0);
 
-            position.setSpeed(UnitsConverter.knotsFromKph(buf.readUnsignedShort()));
+            position.setSpeed(buf.readUnsignedShort());
 
             position.set(Position.KEY_EVENT, readExtByte(buf, codec, CODEC_8_EXT, CODEC_16));
             if (codec == CODEC_16) {
